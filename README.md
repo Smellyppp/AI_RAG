@@ -18,6 +18,31 @@ graph TD
     J --> C
 ```
 
+## 技术栈
+### 核心框架
+- **LangChain** - 用于构建整个RAG管道，包括：
+  - 文档加载与解析
+  - 结构感知的文本分块
+  - 向量数据库集成(FAISS)
+  - 文档表示标准化
+- **Hugging Face Transformers** - 提供LLM和嵌入模型
+- **FAISS** - Facebook高效的相似度搜索库
+
+### 数据处理
+- **PyPDF2** - PDF文档解析
+- **python-docx** - DOCX文档处理
+- **正则表达式(re)** - 文本结构化处理
+- **RecursiveCharacterTextSplitter** - 智能文本分块
+
+### 模型与嵌入
+- **Qwen1.5-0.6B** - 本地部署的轻量级大语言模型
+- **all-MiniLM-L6-v2** - Sentence Transformers轻量级嵌入模型
+
+### 辅助工具
+- **PyTorch** - 深度学习框架
+- **JSON** - 元数据存储
+- **OS** - 文件系统操作
+
 ## 核心功能模块
 
 ### 1. 数据预处理 (`file_processor.py`)
@@ -83,12 +108,6 @@ graph TD
    - 展现神性威严下的疲惫与挣扎
    - 处理虚无侵蚀时的冰冷特质
 
-### 性能优化
-- 本地模型部署（Qwen-0.6B）
-- 批量向量处理
-- 检索生成流水线并行
-- 轻量级FAISS索引
-
 ## 快速开始指南
 
 ### 安装依赖
@@ -119,7 +138,6 @@ python main.py
 天照: 吾宣告：此乃太阳之宿命！为从虚无深渊夺回吾弟月读之神识，纵使神格蒙尘，辉光染晦...
 ```
 
-
 ## 项目结构
 ```
 .
@@ -127,6 +145,7 @@ python main.py
 │   ├── file_processor.py       # 文档预处理脚本
 │   ├── text_chunker.py         # 文本分块处理脚本
 │   ├── vector_db.py            # 向量数据库核心脚本
+│   ├── inspect_vector_db.py    # 向量数据库检查工具
 │   │
 │   ├── Amaterasu/              # 原始角色文档
 │   ├── parsed_document/        # 预处理结果
@@ -140,7 +159,13 @@ python main.py
 ├── Qwen3-0.6B/                 # 大语言模型
 │
 ├── main.py                     # 主程序入口
-├── test_qwen.py                # Qwen测试
 ├── requirements.txt            # Python依赖
 └── README.md                   # 项目说明
+```
+
+## 技术亮点
+1. **结构化感知分块**：保留文档层级结构的分块技术
+2. **角色人格嵌入**：深度整合角色设定到提示工程
+3. **轻量本地化**：所有组件可在消费级GPU运行
+4. **增量知识更新**：支持向量数据库动态扩展
 ```

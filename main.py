@@ -1,13 +1,14 @@
 import time
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from my_knowledge_base.vector_db import VectorizationSystem  # 导入您的向量数据库模块
+# 修改导入方式：从vector_db导入具体函数
+from my_knowledge_base.vector_db import search_vector_db  # 直接导入搜索函数
 
 class RAGSystem:
     def __init__(self, 
                  model_path="./Qwen3-0.6B", 
-                 embedding_model_path="./embedding_model/nlp_gte_sentence-embedding_chinese-large",
-                 vector_db_path="./my_knowledge_base/vector_db",
+                 embedding_model_path="./embedding_model/all-MiniLM-L6-v2",
+                 vector_db_path="./my_knowledge_base/vector_db/faiss_index",
                  context_chunks=3,
                  max_new_tokens=1024):
         """
@@ -26,14 +27,12 @@ class RAGSystem:
             device_map="auto"
         )
         
-        # 初始化向量数据库系统
-        self.vector_system = VectorizationSystem(
-            embedding_model_path=embedding_model_path,
-            vector_db_path=vector_db_path
-        )
+        # 保存向量数据库配置参数
+        self.embedding_model_path = embedding_model_path
+        self.vector_db_path = vector_db_path
+        self.context_chunks = context_chunks
         
         # 配置参数
-        self.context_chunks = context_chunks
         self.max_new_tokens = max_new_tokens
         
         print("RAG系统初始化完成!")
@@ -44,13 +43,19 @@ class RAGSystem:
         :param query: 用户查询
         :return: 相关上下文文本
         """
-        # 执行向量搜索
-        results = self.vector_system.search(query, k=self.context_chunks)
+        # 直接调用搜索函数
+        results = search_vector_db(
+            query=query,
+            vector_db_path=self.vector_db_path,
+            embedding_model_path=self.embedding_model_path,
+            k=self.context_chunks
+        )
         
         # 构建上下文字符串
         context = "以下是与您查询相关的参考信息:\n\n"
         for i, result in enumerate(results):
-            context += f"[参考文档 {i+1}]: {result['text']}\n\n"
+            # 注意：结果中的文本内容在'content'字段
+            context += f"[参考文档 {i+1}]: {result['content']}\n\n"
         
         return context
     
@@ -163,8 +168,8 @@ if __name__ == "__main__":
     # 初始化RAG系统
     rag_system = RAGSystem(
         model_path="./Qwen3-0.6B",
-        embedding_model_path="./embedding_model/nlp_gte_sentence-embedding_chinese-large",  # 替换为您的嵌入模型路径
-        vector_db_path="./my_knowledge_base/vector_db",
+        embedding_model_path="./embedding_model/all-MiniLM-L6-v2",  # 替换为您的嵌入模型路径
+        vector_db_path="./my_knowledge_base/vector_db/faiss_index",
         context_chunks=3,
         max_new_tokens=1024
     )
